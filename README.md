@@ -3,7 +3,7 @@ a small lug n for wp tp allow users to upload wepb files. does what it says
 ---
 
 === WP WebP Uploads ===
-Contributors: TABARC-Code made origionally for gameshaven.co.uk now just sharing.
+Contributors: TABARC-Code made origionally for https://www.gameshaven.co.uk now just sharing.
 Tags: webp, uploads, media, images, gameshaven
 Requires at least: 5.8
 Requires PHP: 7.4
