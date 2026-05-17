@@ -1,0 +1,159 @@
+<?php
+/**
+ * Plugin Name: WP WebP Uploads
+ * Plugin origional user URI: https://gameshaven.co.uk/ This was iitially created to help Games Haven with a minor issue, but as nothing complex and a free fix just uploading for everyone.
+ * Description: Enables safe WebP media uploads for WP, including MIME validation fixes for hosts that do not recognise .webp files by default.
+ * Version: 1.0.2
+ * Author: TABARC-Code
+ * Author URI:  https://github.com/TABARC-Code
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: gameshaven-webp-uploads
+ * Requires at least: 5.8
+ * Requires PHP: 7.4
+ *
+ * @package wp-webp-uploads
+ */
+
+declare(strict_types=1);
+
+if (! defined('ABSPATH')) {
+    exit;
+}
+
+if (! class_exists('WP_WebP_Uploads')) {
+    /**
+     * Adds WebP support to WordPress media uploads.
+     */
+    final class wp_WebP_Uploads
+    {
+        private const MIME_TYPE = 'image/webp';
+        private const EXTENSION = 'webp';
+
+        /**
+         * Register plugin hooks.
+         */
+        public static function init(): void
+        {
+            add_filter('upload_mimes', [self::class, 'allow_webp_mime']);
+            add_filter('wp_check_filetype_and_ext', [self::class, 'fix_webp_filetype'], 10, 5);
+            add_filter('file_is_displayable_image', [self::class, 'mark_webp_displayable'], 10, 2);
+            add_action('admin_notices', [self::class, 'maybe_show_editor_support_notice']);
+        }
+
+        /**
+         * Allow .webp files in the WordPress media library uploader.
+         *
+         * @param array<string, string> $mimes Allowed MIME types keyed by extension.
+         * @return array<string, string>
+         */
+        public static function allow_webp_mime(array $mimes): array
+        {
+            $mimes[self::EXTENSION] = self::MIME_TYPE;
+
+            return $mimes;
+        }
+
+        /**
+         * Correct MIME detection on servers that do not recognise WebP files.
+         *
+         * @param array<string, mixed> $data     Existing WordPress filetype data.
+         * @param string               $file     Full path to the uploaded file.
+         * @param string               $filename Original uploaded filename.
+         * @param array<string, mixed>|null $mimes Allowed MIME types.
+         * @param string|false         $real_mime MIME detected by PHP where available.
+         * @return array<string, mixed>
+         */
+        public static function fix_webp_filetype(array $data, string $file, string $filename, ?array $mimes, $real_mime): array
+        {
+            $extension = strtolower((string) pathinfo($filename, PATHINFO_EXTENSION));
+
+            if (self::EXTENSION !== $extension) {
+                return $data;
+            }
+
+            if (! self::is_valid_webp($file, $real_mime)) {
+                return $data;
+            }
+
+            $data['ext'] = self::EXTENSION;
+            $data['type'] = self::MIME_TYPE;
+            $data['proper_filename'] = $filename;
+
+            return $data;
+        }
+
+        /**
+         * Ensure WebP assets are treated as displayable images in the media library.
+         *
+         * @param bool   $result Current displayable-image result.
+         * @param string $path   File path being checked.
+         * @return bool
+         */
+        public static function mark_webp_displayable(bool $result, string $path): bool
+        {
+            if ($result) {
+                return true;
+            }
+
+            return self::EXTENSION === strtolower((string) pathinfo($path, PATHINFO_EXTENSION)) && self::is_valid_webp($path, false);
+        }
+
+        /**
+         * Warn administrators when the server can upload WebP but cannot edit thumbnails.
+         */
+        public static function maybe_show_editor_support_notice(): void
+        {
+            if (! current_user_can('upload_files') || ! function_exists('wp_image_editor_supports')) {
+                return;
+            }
+
+            if (wp_image_editor_supports(['mime_type' => self::MIME_TYPE])) {
+                return;
+            }
+
+            $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+            if (! $screen || ! in_array($screen->base, ['upload', 'media', 'post'], true)) {
+                return;
+            }
+
+            printf(
+                '<div class="notice notice-warning"><p>%s</p></div>',
+                esc_html__('WP WebP Uploads is active, but this server cannot edit or generate thumbnails for WebP images. Ask your host to enable WebP support in GD or Imagick.', 'wp-webp-uploads')
+            );
+        }
+
+        /**
+         * Verify a file is a genuine WebP image before overriding WordPress MIME data.
+         *
+         * @param string       $file      Full path to the uploaded file.
+         * @param string|false $real_mime MIME detected by PHP where available.
+         * @return bool
+         */
+        private static function is_valid_webp(string $file, $real_mime): bool
+        {
+            if (! is_readable($file)) {
+                return false;
+            }
+
+            if (self::MIME_TYPE === $real_mime) {
+                return true;
+            }
+
+            $handle = fopen($file, 'rb');
+            if (! $handle) {
+                return false;
+            }
+
+            $header = fread($handle, 12);
+            fclose($handle);
+
+            return is_string($header)
+                && 12 === strlen($header)
+                && 'RIFF' === substr($header, 0, 4)
+                && 'WEBP' === substr($header, 8, 4);
+        }
+    }
+}
+
+GamesHaven_WebP_Uploads::init();
