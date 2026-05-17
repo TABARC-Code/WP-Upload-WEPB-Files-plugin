@@ -15,7 +15,7 @@ Allows the WordPress site to upload and use WebP images in the media library.
 
 == Description ==
 
- WebP Uploads enables safe `.webp` uploads for gameshaven.co.uk by registering the WebP MIME type and correcting file validation on hosting environments that do not recognise WebP files automatically.
+ WebP Uploads enables safe `.webp` uploads for Wordpress by registering the WebP MIME type and correcting file validation on hosting environments that do not recognise WebP files automatically.
 
 The plugin checks the uploaded file header before treating a file as WebP, so a renamed non-image file is not blindly accepted.
 
