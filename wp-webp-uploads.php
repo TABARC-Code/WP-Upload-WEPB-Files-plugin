@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name: WP WebP Uploads
- * Plugin origional user URI: https://gameshaven.co.uk/ This was iitially created to help Games Haven with a minor issue, but as nothing complex and a free fix just uploading for everyone.
+ * Plugin URI: https://github.com/TABARC-Code/WP-Upload-WEPB-Files-plugin
  * Description: Enables safe WebP media uploads for WP, including MIME validation fixes for hosts that do not recognise .webp files by default.
  * Version: 1.0.2
  * Author: TABARC-Code
  * Author URI:  https://github.com/TABARC-Code
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: gameshaven-webp-uploads
+ * Text Domain: wp-webp-uploads
  * Requires at least: 5.8
  * Requires PHP: 7.4
  *
@@ -25,7 +25,7 @@ if (! class_exists('WP_WebP_Uploads')) {
     /**
      * Adds WebP support to WordPress media uploads.
      */
-    final class wp_WebP_Uploads
+    final class WP_WebP_Uploads
     {
         private const MIME_TYPE = 'image/webp';
         private const EXTENSION = 'webp';
@@ -156,4 +156,4 @@ if (! class_exists('WP_WebP_Uploads')) {
     }
 }
 
-GamesHaven_WebP_Uploads::init();
+WP_WebP_Uploads::init();

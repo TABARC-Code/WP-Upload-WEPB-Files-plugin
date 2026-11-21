@@ -3,11 +3,11 @@ a small plug in for wp to allow users to upload wepb files. does what it says
 ---
 
 === WP WebP Uploads ===
-Contributors: TABARC-Code made origionally for https://www.gameshaven.co.uk now just sharing.
+Contributors: TABARC-Code, made originally for https://www.gameshaven.co.uk now just sharing.
 Tags: webp, uploads, media, images, gameshaven
 Requires at least: 5.8
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,7 +21,7 @@ The plugin checks the uploaded file header before treating a file as WebP, so a 
 
 == Installation ==
 
-1. Upload the `webp-uploads` folder to `/wp-content/plugins/`.
+1. Upload the `wp-webp-uploads` folder to `/wp-content/plugins/`.
 2. Activate ** WebP Uploads** in **Plugins**.
 3. Upload `.webp` images through **Media > Add New** or the block editor.
 
