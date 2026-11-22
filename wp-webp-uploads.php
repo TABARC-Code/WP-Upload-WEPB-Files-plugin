@@ -49,6 +49,10 @@ if (! class_exists('WP_WebP_Uploads')) {
          */
         public static function allow_webp_mime(array $mimes): array
         {
+            if (! current_user_can('upload_files')) {
+                return $mimes;
+            }
+
             $mimes[self::EXTENSION] = self::MIME_TYPE;
 
             return $mimes;
@@ -66,6 +70,10 @@ if (! class_exists('WP_WebP_Uploads')) {
          */
         public static function fix_webp_filetype(array $data, string $file, string $filename, ?array $mimes, $real_mime): array
         {
+            if (! current_user_can('upload_files')) {
+                return $data;
+            }
+
             $extension = strtolower((string) pathinfo($filename, PATHINFO_EXTENSION));
 
             if (self::EXTENSION !== $extension) {
